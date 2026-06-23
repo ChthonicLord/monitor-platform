@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 
-const navStyle: Record<string, React.CSSProperties> = {
+const navStyle: Record<string, any> = {
   container: {
     display: 'flex',
     height: '100vh',

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
 
-const styles: Record<string, React.CSSProperties> = {
+// allow function-valued entries like tag: (type) => React.CSSProperties
+const styles: Record<string, any> = {
   card: {
     background: '#fff',
     borderRadius: 8,

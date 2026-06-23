@@ -12,7 +12,7 @@ const METRIC_LABELS: Record<string, string> = {
   largestContentfulPaint: 'LCP',
 };
 
-const styles: Record<string, React.CSSProperties> = {
+const styles: Record<string, any> = {
   card: { background: '#fff', borderRadius: 8, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: 16 },
   metricSelector: { display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 },
   metricBtn: (active: boolean): React.CSSProperties => ({
@@ -97,7 +97,7 @@ export default function PerformanceTrend() {
       {/* 指标选择器 */}
       <div style={styles.metricSelector}>
         {METRICS.map((m) => (
-          <button key={m} style={styles.metricBtn(metric === m)} onClick={() => setMetric(m)}>
+          <button key={m} style={styles.metricBtn?.(metric === m)} onClick={() => setMetric(m)}>
             {METRIC_LABELS[m] || m}
           </button>
         ))}

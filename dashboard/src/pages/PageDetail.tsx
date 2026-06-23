@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
 
-const styles: Record<string, React.CSSProperties> = {
+const styles: {
+  card: React.CSSProperties;
+  table: React.CSSProperties;
+  th: React.CSSProperties;
+  td: React.CSSProperties;
+  tabs: React.CSSProperties;
+  tab: (active: boolean) => React.CSSProperties;
+  pagination: React.CSSProperties;
+  pageBtn: React.CSSProperties;
+} = {
   card: { background: '#fff', borderRadius: 8, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: 16 },
   table: { width: '100%', borderCollapse: 'collapse' as const, fontSize: 13 },
   th: { textAlign: 'left' as const, padding: '8px 12px', borderBottom: '2px solid #eee', color: '#666', fontWeight: 600 },

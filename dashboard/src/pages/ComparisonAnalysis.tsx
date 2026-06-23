@@ -9,7 +9,9 @@ const METRIC_LABELS: Record<string, string> = {
   largestContentfulPaint: 'LCP',
 };
 
-const styles: Record<string, React.CSSProperties> = {
+// styles contains both plain style objects and a function that returns a style object,
+// so use a more permissive type to satisfy TypeScript.
+const styles: Record<string, any> = {
   card: { background: '#fff', borderRadius: 8, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: 16 },
   metricSelector: { display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 },
   metricBtn: (active: boolean): React.CSSProperties => ({
