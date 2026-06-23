@@ -22,8 +22,8 @@ jobs:
       - name: Build Dashboard
         run: |
           cd dashboard
-          yarn install
-          yarn build
+          npm install
+          npm run build
 
       # ============================================================
       #  构建 Server（TypeScript → CommonJS）
@@ -31,54 +31,71 @@ jobs:
       - name: Build Server
         run: |
           cd server
-          yarn install
-          yarn build
+          npm install
+          npm run build
 
       # ============================================================
-      #  上传 Dashboard 静态文件
-      #  dashboard/dist/** → /var/www/monitor-platform/dashboard/
+      #  打包（避免 SCP glob 问题）
       # ============================================================
-      - name: Deploy Dashboard
+      - name: Package artifacts
+        run: |
+          cd dashboard/dist && tar czf ../../dashboard-dist.tar.gz . && cd ../..
+          cd server/dist    && tar czf ../../server-dist.tar.gz .    && cd ../..
+          cp server/package.json server-package.json
+
+      # ============================================================
+      #  上传 Dashboard
+      # ============================================================
+      - name: Upload Dashboard
         uses: appleboy/scp-action@v0.1.5
         with:
           host: ${{ secrets.ALIYUN_HOST }}
           username: ${{ secrets.ALIYUN_USERNAME }}
           key: ${{ secrets.ALIYUN_SSH_KEY }}
-          source: 'dashboard/dist/**/*'
-          target: '/var/www/monitor-platform/dashboard/'
-          strip_components: 2
+          source: 'dashboard-dist.tar.gz'
+          target: '/tmp/'
+          strip_components: 0
 
       # ============================================================
-      #  上传 Server 代码 + package.json
-      #  server/dist/** → /var/www/monitor-platform/server/dist/
-      #  server/package.json → /var/www/monitor-platform/server/package.json
+      #  上传 Server
       # ============================================================
-      - name: Deploy Server
+      - name: Upload Server
         uses: appleboy/scp-action@v0.1.5
         with:
           host: ${{ secrets.ALIYUN_HOST }}
           username: ${{ secrets.ALIYUN_USERNAME }}
           key: ${{ secrets.ALIYUN_SSH_KEY }}
-          source: 'server/dist/**/*,server/package.json'
-          target: '/var/www/monitor-platform/server/'
-          strip_components: 1
+          source: 'server-dist.tar.gz,server-package.json'
+          target: '/tmp/'
+          strip_components: 0
 
       # ============================================================
-      #  服务器端：安装依赖 + 重启 PM2
+      #  服务器端：解压 + 安装依赖 + 重启
       # ============================================================
-      - name: Restart Server
+      - name: Deploy & Restart
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.ALIYUN_HOST }}
           username: ${{ secrets.ALIYUN_USERNAME }}
           key: ${{ secrets.ALIYUN_SSH_KEY }}
           script: |
-            # 确保 PM2 已安装
-            which pm2 || yarn install -g pm2
-            # 确保目录存在
-            mkdir -p /var/www/monitor-platform/server
+            set -e
+
+            # ---- Dashboard ----
+            mkdir -p /var/www/monitor-platform/dashboard
+            tar xzf /tmp/dashboard-dist.tar.gz -C /var/www/monitor-platform/dashboard/
+            rm /tmp/dashboard-dist.tar.gz
+            echo "Dashboard deployed: $(ls /var/www/monitor-platform/dashboard/ | head -5)"
+
+            # ---- Server ----
+            mkdir -p /var/www/monitor-platform/server/dist
+            tar xzf /tmp/server-dist.tar.gz -C /var/www/monitor-platform/server/dist/
+            cp /tmp/server-package.json /var/www/monitor-platform/server/package.json
+            rm /tmp/server-dist.tar.gz /tmp/server-package.json
+
             cd /var/www/monitor-platform/server
-            yarn install --production
+            npm install --production
+            which pm2 || npm install -g pm2
             pm2 restart monitor-server || pm2 start dist/index.js --name monitor-server
             pm2 save
             echo "=== PM2 status ==="
