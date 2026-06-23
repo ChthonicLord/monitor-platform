@@ -1,12 +1,58 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>前端监控平台</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitor Platform — 前端监控平台</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@100..900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "background": "#f7f9fb",
+            "surface": "#FFFFFF",
+            "surface-container": "#eceef0",
+            "surface-container-low": "#f2f4f6",
+            "surface-container-high": "#e6e8ea",
+            "primary": "#0f62fe",
+            "primary-fixed": "#dbe1ff",
+            "on-primary": "#ffffff",
+            "on-background": "#191c1e",
+            "on-surface": "#191c1e",
+            "on-surface-variant": "#424656",
+            "text-primary": "#1E293B",
+            "text-secondary": "#475569",
+            "text-muted": "#94A3B8",
+            "border": "#E2E8F0",
+            "outline": "#737687",
+            "outline-variant": "#c3c6d8",
+            "error": "#DC2626",
+            "error-container": "#ffdad6",
+            "warning": "#EA580C",
+            "success": "#16A34A",
+            "secondary": "#b71d3f",
+            "secondary-container": "#fc536d",
+            "tertiary": "#9e3100",
+            "tertiary-container": "#c84000",
+          },
+          fontFamily: {
+            "headline": ["Hanken Grotesk", "sans-serif"],
+            "body": ["Inter", "sans-serif"],
+          },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-[#f7f9fb] font-body text-text-primary antialiased">
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
 </html>

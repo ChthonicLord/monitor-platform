@@ -1,0 +1,80 @@
+/* ================================================================
+ *  Monitor Platform — 全局样式（PulseMetrics 风格）
+ * ================================================================ */
+
+/* Material Symbols 基础样式 */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+/* Bento 卡片 —— 微悬浮 + hover 上浮 */
+.bento-card {
+  background: #ffffff;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.bento-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+/* Glass 卡片 */
+.glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* 自定义滚动条 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 10px;
+}
+
+/* 淡入动画 */
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 统计数值字体 */
+.stat-display {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 32px;
+  line-height: 32px;
+  font-weight: 700;
+}
+
+/* 彩色顶部条卡片变体 */
+.card-accent-error { border-top: 3px solid #DC2626; }
+.card-accent-warning { border-top: 3px solid #EA580C; }
+.card-accent-success { border-top: 3px solid #16A34A; }
+.card-accent-primary { border-top: 3px solid #0f62fe; }
+.card-accent-purple { border-top: 3px solid #7c3aed; }
+.card-accent-cyan { border-top: 3px solid #0891b2; }
+
+/* 脉冲告警指示灯 */
+.alert-pulse {
+  animation: alertPulse 2s ease-in-out infinite;
+}
+@keyframes alertPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}

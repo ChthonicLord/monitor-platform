@@ -45,4 +45,11 @@ export const api = {
     const qs = new URLSearchParams(params as any).toString();
     return fetchJson<any>(`${BASE}/resources?${qs}`);
   },
+
+  /** 告警 */
+  getAlerts: {
+    active: () => fetchJson<any>('/api/alerts/active'),
+    history: (limit?: number) => fetchJson<any>(`/api/alerts/history${limit ? `?limit=${limit}` : ''}`),
+    rules: () => fetchJson<any>('/api/alerts/rules'),
+  },
 };

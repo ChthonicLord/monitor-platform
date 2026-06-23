@@ -112,11 +112,19 @@ router.get('/dashboard', (req: Request, res: Response) => {
     const { appId } = req.query;
     const now = Date.now();
     const oneHourAgo = now - 3600_000;
+    const twoHoursAgo = now - 7200_000;
 
-    // 统计各类事件数
+    // 统计各类事件数（当前周期）
     const typeCounts = elasticsearch.aggregateByType({
       appId: appId as string,
       startTime: oneHourAgo,
+    });
+
+    // 统计上一周期事件数（用于对比趋势）
+    const prevCounts = elasticsearch.aggregateByType({
+      appId: appId as string,
+      startTime: twoHoursAgo,
+      endTime: oneHourAgo,
     });
 
     // 错误详情
@@ -135,9 +143,18 @@ router.get('/dashboard', (req: Request, res: Response) => {
       groupBy: 'day',
     });
 
+    // 错误类型分布
+    const errorBreakdown = elasticsearch.aggregateByErrorType({ startTime: oneHourAgo });
+
+    // UV 统计（近 1 小时去重用户数）
+    const uv = elasticsearch.countUniqueUsers({ startTime: oneHourAgo });
+
     res.json({
       timestamp: now,
       eventCounts: typeCounts,
+      prevEventCounts: prevCounts,
+      errorBreakdown,
+      uniqueUsers: uv,
       recentErrors: errors,
       performanceSummary: perf.buckets.slice(0, 5),
     });

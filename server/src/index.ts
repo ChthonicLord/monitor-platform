@@ -14,9 +14,11 @@ import { corsMiddleware } from './middleware/cors';
 import { rateLimitMiddleware } from './middleware/ratelimit';
 import reportRouter from './routes/report';
 import queryRouter from './routes/query';
+import alertRouter from './routes/alerts';
 import { kafka } from './services/kafka';
 import { elasticsearch } from './services/elasticsearch';
 import { clickhouse } from './services/clickhouse';
+import { alertEngine } from './services/alert-engine';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -31,6 +33,7 @@ app.use('/api/report', rateLimitMiddleware);
 // ---- 路由 ----
 app.use('/api', reportRouter);
 app.use('/api/query', queryRouter);
+app.use('/api/alerts', alertRouter);
 
 // 健康检查
 app.get('/api/health', (_req, res) => {
@@ -69,6 +72,9 @@ kafka.consume((data) => {
     }
   }
 });
+
+// ---- 启动告警引擎 ----
+alertEngine.start();
 
 // ---- 启动服务 ----
 app.listen(PORT, () => {

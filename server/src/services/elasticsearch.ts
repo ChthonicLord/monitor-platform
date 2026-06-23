@@ -101,6 +101,46 @@ class ElasticsearchAdapter {
     return counts;
   }
 
+  /** 统计错误类型分布（按 errorType 聚合） */
+  aggregateByErrorType(params: { appId?: string; startTime?: number; endTime?: number }): Record<string, number> {
+    let filtered = [...this.store];
+    if (params.appId) {
+      filtered = filtered.filter((e) => e.data.appId === params.appId);
+    }
+    if (params.startTime) {
+      filtered = filtered.filter((e) => e.timestamp >= params.startTime!);
+    }
+    if (params.endTime) {
+      filtered = filtered.filter((e) => e.timestamp <= params.endTime!);
+    }
+    // 只看错误事件
+    filtered = filtered.filter((e) => e.eventType === 'error');
+
+    const counts: Record<string, number> = {};
+    for (const entry of filtered) {
+      const errType = (entry.data as any)?.errorType as string || 'Unknown';
+      counts[errType] = (counts[errType] || 0) + 1;
+    }
+    return counts;
+  }
+
+  /** 统计去重用户数（UV） */
+  countUniqueUsers(params: { startTime?: number; endTime?: number }): number {
+    let filtered = [...this.store];
+    if (params.startTime) {
+      filtered = filtered.filter((e) => e.timestamp >= params.startTime!);
+    }
+    if (params.endTime) {
+      filtered = filtered.filter((e) => e.timestamp <= params.endTime!);
+    }
+    const userIds = new Set<string>();
+    for (const entry of filtered) {
+      const uid = (entry.data?.userInfo as Record<string, unknown> | undefined)?.userId as string | undefined;
+      if (uid) userIds.add(uid);
+    }
+    return userIds.size;
+  }
+
   /** 清理过期数据（7天前） */
   private cleanup(): void {
     const cutoff = Date.now() - this.retentionMs;
