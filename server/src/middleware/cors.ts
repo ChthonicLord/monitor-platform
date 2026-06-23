@@ -12,6 +12,7 @@ export function corsMiddleware(
   // 动态回显请求来源，支持 credentials: include
   const origin = req.headers.origin;
   res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
