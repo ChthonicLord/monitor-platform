@@ -1,0 +1,85 @@
+name: Build & Deploy Monitor Platform
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # ============================================================
+      #  构建 Dashboard（Vite + React SPA）
+      # ============================================================
+      - name: Build Dashboard
+        run: |
+          cd dashboard
+          npm install
+          npm run build
+
+      # ============================================================
+      #  构建 Server（TypeScript → CommonJS）
+      # ============================================================
+      - name: Build Server
+        run: |
+          cd server
+          npm install
+          npm run build
+
+      # ============================================================
+      #  上传 Dashboard 静态文件
+      #  dashboard/dist/** → /var/www/monitor-platform/dashboard/
+      # ============================================================
+      - name: Deploy Dashboard
+        uses: appleboy/scp-action@v0.1.5
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: 'dashboard/dist/**/*'
+          target: '/var/www/monitor-platform/dashboard/'
+          strip_components: 2
+
+      # ============================================================
+      #  上传 Server 代码 + package.json
+      #  server/dist/** → /var/www/monitor-platform/server/dist/
+      #  server/package.json → /var/www/monitor-platform/server/package.json
+      # ============================================================
+      - name: Deploy Server
+        uses: appleboy/scp-action@v0.1.5
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: 'server/dist/**/*,server/package.json'
+          target: '/var/www/monitor-platform/server/'
+          strip_components: 1
+
+      # ============================================================
+      #  服务器端：安装依赖 + 重启 PM2
+      # ============================================================
+      - name: Restart Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            # 确保 PM2 已安装
+            which pm2 || npm install -g pm2
+            # 确保目录存在
+            mkdir -p /var/www/monitor-platform/server
+            cd /var/www/monitor-platform/server
+            npm install --production
+            pm2 restart monitor-server || pm2 start dist/index.js --name monitor-server
+            pm2 save
+            echo "=== PM2 status ==="
+            pm2 list
